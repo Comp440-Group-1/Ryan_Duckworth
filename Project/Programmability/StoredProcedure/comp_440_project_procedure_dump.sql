@@ -1,6 +1,6 @@
 USE [s16guest06]
 GO
-/****** Object:  StoredProcedure [dbo].[GenerateMonthlyReport]    Script Date: 5/5/2016 5:33:52 AM ******/
+/****** Object:  StoredProcedure [dbo].[GenerateMonthlyReport]    Script Date: 5/5/2016 9:08:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -21,18 +21,18 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-SELECT dbo.Product.product_id AS ProductID, dbo.Product.product_description AS ProductDescription, dbo.Version.version_number AS Version, MONTH(dbo.download.download_date) AS ReportingMonth, COUNT(dbo.download.download_date) AS DownloadCount
+SELECT dbo.Product.product_name AS ProductName, dbo.Version.version_number AS Version, MONTH(dbo.download.download_date) AS ReportingMonth, COUNT(dbo.download.download_date) AS DownloadCount
 FROM dbo.Download
 JOIN dbo.Product ON dbo.Download.product_id = dbo.Product.product_id
 JOIN dbo.CustomerRelease ON dbo.CustomerRelease.customer_release_id = dbo.Download.customer_release_id
 JOIN dbo.DevelopmentRelease ON dbo.DevelopmentRelease.development_release_id = dbo.CustomerRelease.development_release_id
 JOIN dbo.Version ON dbo.Version.version_id = dbo.DevelopmentRelease.version_id
-GROUP BY MONTH(dbo.download.download_date), dbo.Product.product_id, dbo.Product.product_description, dbo.Version.version_number
-
+GROUP BY MONTH(dbo.download.download_date), dbo.Product.product_name, dbo.Version.version_number
+ORDER BY ReportingMonth
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[GetNewFeatures]    Script Date: 5/5/2016 5:33:52 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetNewFeatures]    Script Date: 5/5/2016 9:08:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -53,7 +53,7 @@ GO
 --			   @v_id: The version id to be used as the current version
 --			   @v_id_previous: version id which is used to compare with the new version. All version releases in between
 --							   determining what new features, if any, are in the new @v_id release
--- Sample Run: EXEC GetNewFeatures @v_id = 7;
+-- Sample Run: EXEC GetNewFeatures @v_id = 1, @product_id = 1;
 -- =============================================
 CREATE PROCEDURE [dbo].[GetNewFeatures] 
 	-- Add the parameters for the stored procedure here
@@ -76,9 +76,9 @@ RAISERROR('Version id not set to appropriate value', 18, 1);
 RETURN ;
 END
 
-IF @product_id = -1
+IF @product_id = -1 OR (SELECT COUNT(*) FROM Product WHERE product_id =@product_id) = 0
 BEGIN
-RAISERROR('Product id not set to appropriate value', 18, 1);
+RAISERROR('Product id not set to an appropriate value', 18, 1);
 RETURN ;
 END
 
@@ -115,7 +115,7 @@ PRINT ('This is a bug fix release, there are no new features in release ' + CAST
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[StateInsert]    Script Date: 5/5/2016 5:33:52 AM ******/
+/****** Object:  StoredProcedure [dbo].[StateInsert]    Script Date: 5/5/2016 9:08:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -124,27 +124,40 @@ GO
 -- Author:		<Duckworth, Ryan>
 -- Create date: <5/3/16>
 -- Description:	<Inserts a state_name into the State table>
+-- Prerequisites: None
+-- Error Checking: It rolls back an unsuccessful insert
+-- Sample Run: EXEC StateInsert @state_name = 'New Mexico'
 -- =============================================
 CREATE PROCEDURE [dbo].[StateInsert] 
 	   @state_name varchar(50)
 AS
-BEGIN TRY
+
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
+BEGIN TRANSACTION
+BEGIN TRY
     -- Insert statements for procedure here
 	INSERT INTO dbo.State (state_name)
 	VALUES (@state_name);
+SELECT * FROM State
+COMMIT TRANSACTION
 END TRY
 BEGIN CATCH
-INSERT INTO dbo.State (state_name)
-VALUES ('invalid');
-THROW
-END CATCH
+    SELECT
 
+        ERROR_LINE() AS ErrorLine,
+        ERROR_MESSAGE() AS ErrorMessage,
+		ERROR_NUMBER() AS ErrorNumber,
+        ERROR_SEVERITY() AS ErrorSeverity,
+        ERROR_STATE() AS ErrorState,
+        ERROR_PROCEDURE() AS ErrorProcedure;
+
+	ROLLBACK TRANSACTION
+END CATCH
 GO
-/****** Object:  StoredProcedure [dbo].[UpdateVersion]    Script Date: 5/5/2016 5:33:52 AM ******/
+/****** Object:  StoredProcedure [dbo].[UpdateVersion]    Script Date: 5/5/2016 9:08:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -160,7 +173,7 @@ GO
 CREATE PROCEDURE [dbo].[UpdateVersion]
 
 	@product_id int = -1,
-	@new_version_number int = 1
+	@new_version_number float = 1
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -170,11 +183,14 @@ BEGIN
 IF (SELECT COUNT(*) FROM dbo.Product WHERE product_id = @product_id) = 0
 
 BEGIN
-PRINT 'No matching product_id in the Product table!';
+RAISERROR('No matching product_id in the Product table!', 18, 1);
+RETURN ;
 END
 
 ELSE
-BEGIN
+
+BEGIN TRANSACTION
+BEGIN TRY
 
 UPDATE dbo.Version
 SET version_number = @new_version_number
@@ -182,10 +198,26 @@ WHERE version_number=
 (SELECT MAX(version_number)
 FROM dbo.Version
 WHERE product_id = @product_id);
+
+
 PRINT 'Updated Version Number!'
+SELECT * FROM Version
+COMMIT TRANSACTION
+END TRY
+BEGIN CATCH
+    SELECT
+
+        ERROR_LINE() AS ErrorLine,
+        ERROR_MESSAGE() AS ErrorMessage,
+		ERROR_NUMBER() AS ErrorNumber,
+        ERROR_SEVERITY() AS ErrorSeverity,
+        ERROR_STATE() AS ErrorState,
+        ERROR_PROCEDURE() AS ErrorProcedure;
+
+	ROLLBACK TRANSACTION
+END CATCH
 
 END
 
-END
 
 GO
