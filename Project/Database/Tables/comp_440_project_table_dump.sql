@@ -1,6 +1,6 @@
 USE [s16guest06]
 GO
-/****** Object:  Table [dbo].[Address]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Address]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,7 +23,7 @@ CREATE TABLE [dbo].[Address](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Branch]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Branch]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -40,7 +40,7 @@ CREATE TABLE [dbo].[Branch](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[City]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[City]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -59,7 +59,7 @@ CREATE TABLE [dbo].[City](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Company]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Company]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -80,7 +80,7 @@ CREATE TABLE [dbo].[Company](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Country]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Country]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -99,7 +99,7 @@ CREATE TABLE [dbo].[Country](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Customer]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Customer]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -121,7 +121,7 @@ CREATE TABLE [dbo].[Customer](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[CustomerRelease]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[CustomerRelease]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -133,6 +133,7 @@ CREATE TABLE [dbo].[CustomerRelease](
 	[customer_release_id] [int] IDENTITY(1,1) NOT NULL,
 	[development_release_id] [int] NOT NULL,
 	[customer_release_date] [date] NULL,
+	[type_of_release] [varchar](50) NULL,
  CONSTRAINT [PK_CustomerRelease] PRIMARY KEY CLUSTERED 
 (
 	[customer_release_id] ASC
@@ -142,7 +143,7 @@ CREATE TABLE [dbo].[CustomerRelease](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[date_test]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[date_test]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -153,7 +154,7 @@ CREATE TABLE [dbo].[date_test](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[DevelopmentRelease]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[DevelopmentRelease]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -170,7 +171,7 @@ CREATE TABLE [dbo].[DevelopmentRelease](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[Download]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Download]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -195,7 +196,7 @@ CREATE TABLE [dbo].[Download](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Feature]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Feature]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -206,6 +207,7 @@ CREATE TABLE [dbo].[Feature](
 	[feature_description] [varchar](100) NULL,
 	[feature_id] [int] IDENTITY(1,1) NOT NULL,
 	[product_id] [int] NULL,
+	[bugfix] [bit] NOT NULL,
  CONSTRAINT [PK__Feature] PRIMARY KEY CLUSTERED 
 (
 	[feature_id] ASC
@@ -215,7 +217,7 @@ CREATE TABLE [dbo].[Feature](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[FeatureVersion]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[FeatureVersion]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -231,7 +233,7 @@ CREATE TABLE [dbo].[FeatureVersion](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[Iteration]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Iteration]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -247,7 +249,7 @@ CREATE TABLE [dbo].[Iteration](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[Phone]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Phone]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -263,7 +265,7 @@ CREATE TABLE [dbo].[Phone](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[PhoneType]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[PhoneType]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -282,7 +284,7 @@ CREATE TABLE [dbo].[PhoneType](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Product]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Product]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -292,6 +294,7 @@ GO
 CREATE TABLE [dbo].[Product](
 	[product_description] [varchar](500) NULL,
 	[product_id] [int] IDENTITY(1,1) NOT NULL,
+	[product_name] [varchar](50) NOT NULL,
  CONSTRAINT [PK__Product] PRIMARY KEY CLUSTERED 
 (
 	[product_id] ASC
@@ -301,7 +304,7 @@ CREATE TABLE [dbo].[Product](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[sample data]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[sample data]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -322,7 +325,7 @@ CREATE TABLE [dbo].[sample data](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[SoftwarePlatform]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[SoftwarePlatform]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -341,7 +344,7 @@ CREATE TABLE [dbo].[SoftwarePlatform](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[State]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[State]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -360,7 +363,7 @@ CREATE TABLE [dbo].[State](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Version]    Script Date: 5/5/2016 2:03:17 AM ******/
+/****** Object:  Table [dbo].[Version]    Script Date: 5/5/2016 5:33:22 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -380,6 +383,10 @@ GO
 ALTER TABLE [dbo].[CustomerRelease] ADD  CONSTRAINT [DF_CustomerRelease_customer_release_date]  DEFAULT (getdate()) FOR [customer_release_date]
 GO
 ALTER TABLE [dbo].[Download] ADD  CONSTRAINT [DF_Download_download_date]  DEFAULT (getdate()) FOR [download_date]
+GO
+ALTER TABLE [dbo].[Feature] ADD  CONSTRAINT [DF_Feature_bugfix]  DEFAULT ((0)) FOR [bugfix]
+GO
+ALTER TABLE [dbo].[Product] ADD  CONSTRAINT [DF_Product_product_name]  DEFAULT ('Placeholder Name') FOR [product_name]
 GO
 ALTER TABLE [dbo].[Address]  WITH CHECK ADD  CONSTRAINT [FK_Address_City] FOREIGN KEY([city_id])
 REFERENCES [dbo].[City] ([city_id])

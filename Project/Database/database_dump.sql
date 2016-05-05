@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [s16guest06]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Database [s16guest06]    Script Date: 5/5/2016 5:32:52 AM ******/
 CREATE DATABASE [s16guest06]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -77,12 +77,12 @@ EXEC sys.sp_db_vardecimal_storage_format N's16guest06', N'ON'
 GO
 USE [s16guest06]
 GO
-/****** Object:  User [s16guest06]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  User [s16guest06]    Script Date: 5/5/2016 5:32:52 AM ******/
 CREATE USER [s16guest06] FOR LOGIN [s16guest06] WITH DEFAULT_SCHEMA=[dbo]
 GO
 ALTER ROLE [db_owner] ADD MEMBER [s16guest06]
 GO
-/****** Object:  StoredProcedure [dbo].[GenerateMonthlyReport]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  StoredProcedure [dbo].[GenerateMonthlyReport]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -114,7 +114,90 @@ GROUP BY MONTH(dbo.download.download_date), dbo.Product.product_id, dbo.Product.
 END
 
 GO
-/****** Object:  StoredProcedure [dbo].[StateInsert]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetNewFeatures]    Script Date: 5/5/2016 5:32:52 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Duckworth, Ryan>
+-- Create date: <5/4/16>
+-- Description:	<Gets the number of new features for any given version since the previous release>
+-- Prerequisites: All dependency tables must be filled in order to utilize this function.
+
+-- Notes: If no previous version number is supplied, then the function will use the last version major release
+--		  as the basis for calculating the number of new features. This function does not work on version number
+--		  1.0 because the basis of the function is to compare between two major versions and print a message that
+--		  could be used on the website to announce new features. If it's the first release, then all the features
+--		  would be new by default, and this function wouldn't be needed.
+
+-- Parameters: @product_id: The product id to be used to determing the new features for the release. Must be supplied.
+--			   @v_id: The version id to be used as the current version
+--			   @v_id_previous: version id which is used to compare with the new version. All version releases in between
+--							   determining what new features, if any, are in the new @v_id release
+-- Sample Run: EXEC GetNewFeatures @v_id = 7;
+-- =============================================
+CREATE PROCEDURE [dbo].[GetNewFeatures] 
+	-- Add the parameters for the stored procedure here
+	@product_id int = -1,
+	@v_id int = -1,
+	@v_id_previous float = -1
+
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+DECLARE @v_num AS float;
+DECLARE @v_num_previous AS float;
+
+IF @v_id = -1
+BEGIN
+RAISERROR('Version id not set to appropriate value', 18, 1);
+RETURN ;
+END
+
+IF @product_id = -1
+BEGIN
+RAISERROR('Product id not set to appropriate value', 18, 1);
+RETURN ;
+END
+
+SET @v_num = (SELECT version_number FROM Version
+WHERE version_id = @v_id)
+
+IF @v_id_previous = -1
+BEGIN
+
+SET @v_num_previous = (CEILING(@v_num) -1)
+
+END
+
+ELSE
+BEGIN
+SET @v_num_previous = (SELECT version_number FROM Version
+WHERE version_id = @v_id_previous)
+END
+
+DECLARE @new_features AS int
+SELECT @new_features =
+(SELECT COUNT(*)
+FROM dbo.FeatureVersion
+JOIN dbo.Version ON FeatureVersion.version_id = dbo.Version.version_id
+JOIN dbo.Feature ON FeatureVersion.feature_id = dbo.Feature.feature_id
+WHERE dbo.Version.product_id = @product_id AND dbo.Version.version_number <= @v_num AND dbo.Version.version_number > @v_num_previous AND dbo.Feature.bugfix = 0)
+
+IF @new_features > 0
+PRINT ('There are ' + CAST(@new_features AS VARCHAR(20)) + ' new features in the ' + CAST(@v_num AS VARCHAR(20)) +
+ ' release since the previous release ' + CAST(@v_num_previous AS VARCHAR(20)) + '!') 
+ELSE
+PRINT ('This is a bug fix release, there are no new features in release ' + CAST(@v_num AS VARCHAR(20)));
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[StateInsert]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -143,7 +226,7 @@ THROW
 END CATCH
 
 GO
-/****** Object:  StoredProcedure [dbo].[UpdateVersion]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  StoredProcedure [dbo].[UpdateVersion]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -188,7 +271,7 @@ END
 END
 
 GO
-/****** Object:  Table [dbo].[Address]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Address]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -211,7 +294,7 @@ CREATE TABLE [dbo].[Address](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Branch]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Branch]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -228,7 +311,7 @@ CREATE TABLE [dbo].[Branch](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[City]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[City]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -247,7 +330,7 @@ CREATE TABLE [dbo].[City](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Company]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Company]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -268,7 +351,7 @@ CREATE TABLE [dbo].[Company](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Country]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Country]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -287,7 +370,7 @@ CREATE TABLE [dbo].[Country](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Customer]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Customer]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -309,7 +392,7 @@ CREATE TABLE [dbo].[Customer](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[CustomerRelease]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[CustomerRelease]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -321,6 +404,7 @@ CREATE TABLE [dbo].[CustomerRelease](
 	[customer_release_id] [int] IDENTITY(1,1) NOT NULL,
 	[development_release_id] [int] NOT NULL,
 	[customer_release_date] [date] NULL,
+	[type_of_release] [varchar](50) NULL,
  CONSTRAINT [PK_CustomerRelease] PRIMARY KEY CLUSTERED 
 (
 	[customer_release_id] ASC
@@ -330,7 +414,7 @@ CREATE TABLE [dbo].[CustomerRelease](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[date_test]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[date_test]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -341,7 +425,7 @@ CREATE TABLE [dbo].[date_test](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[DevelopmentRelease]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[DevelopmentRelease]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -358,7 +442,7 @@ CREATE TABLE [dbo].[DevelopmentRelease](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[Download]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Download]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -383,7 +467,7 @@ CREATE TABLE [dbo].[Download](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Feature]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Feature]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -394,6 +478,7 @@ CREATE TABLE [dbo].[Feature](
 	[feature_description] [varchar](100) NULL,
 	[feature_id] [int] IDENTITY(1,1) NOT NULL,
 	[product_id] [int] NULL,
+	[bugfix] [bit] NOT NULL,
  CONSTRAINT [PK__Feature] PRIMARY KEY CLUSTERED 
 (
 	[feature_id] ASC
@@ -403,7 +488,7 @@ CREATE TABLE [dbo].[Feature](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[FeatureVersion]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[FeatureVersion]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -419,7 +504,7 @@ CREATE TABLE [dbo].[FeatureVersion](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[Iteration]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Iteration]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -435,7 +520,7 @@ CREATE TABLE [dbo].[Iteration](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[Phone]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Phone]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -451,7 +536,7 @@ CREATE TABLE [dbo].[Phone](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[PhoneType]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[PhoneType]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -470,7 +555,7 @@ CREATE TABLE [dbo].[PhoneType](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Product]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Product]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -480,6 +565,7 @@ GO
 CREATE TABLE [dbo].[Product](
 	[product_description] [varchar](500) NULL,
 	[product_id] [int] IDENTITY(1,1) NOT NULL,
+	[product_name] [varchar](50) NOT NULL,
  CONSTRAINT [PK__Product] PRIMARY KEY CLUSTERED 
 (
 	[product_id] ASC
@@ -489,7 +575,7 @@ CREATE TABLE [dbo].[Product](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[sample data]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[sample data]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -510,7 +596,7 @@ CREATE TABLE [dbo].[sample data](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[SoftwarePlatform]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[SoftwarePlatform]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -529,7 +615,7 @@ CREATE TABLE [dbo].[SoftwarePlatform](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[State]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[State]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -548,7 +634,7 @@ CREATE TABLE [dbo].[State](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Version]    Script Date: 5/5/2016 2:04:49 AM ******/
+/****** Object:  Table [dbo].[Version]    Script Date: 5/5/2016 5:32:52 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -568,6 +654,10 @@ GO
 ALTER TABLE [dbo].[CustomerRelease] ADD  CONSTRAINT [DF_CustomerRelease_customer_release_date]  DEFAULT (getdate()) FOR [customer_release_date]
 GO
 ALTER TABLE [dbo].[Download] ADD  CONSTRAINT [DF_Download_download_date]  DEFAULT (getdate()) FOR [download_date]
+GO
+ALTER TABLE [dbo].[Feature] ADD  CONSTRAINT [DF_Feature_bugfix]  DEFAULT ((0)) FOR [bugfix]
+GO
+ALTER TABLE [dbo].[Product] ADD  CONSTRAINT [DF_Product_product_name]  DEFAULT ('Placeholder Name') FOR [product_name]
 GO
 ALTER TABLE [dbo].[Address]  WITH CHECK ADD  CONSTRAINT [FK_Address_City] FOREIGN KEY([city_id])
 REFERENCES [dbo].[City] ([city_id])
