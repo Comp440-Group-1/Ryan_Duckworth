@@ -1,6 +1,6 @@
 USE [s16guest06]
 GO
-/****** Object:  Table [dbo].[Address]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Address]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -11,9 +11,9 @@ CREATE TABLE [dbo].[Address](
 	[address_id] [int] IDENTITY(1,1) NOT NULL,
 	[city_id] [int] NOT NULL,
 	[country_id] [int] NOT NULL,
-	[state_id] [int] NOT NULL,
+	[state_id] [int] NULL,
 	[street] [varchar](100) NOT NULL,
-	[zip_code] [int] NOT NULL,
+	[zip_code] [int] NULL,
  CONSTRAINT [PK__Address] PRIMARY KEY CLUSTERED 
 (
 	[address_id] ASC
@@ -23,24 +23,7 @@ CREATE TABLE [dbo].[Address](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Branch]    Script Date: 5/5/2016 5:33:22 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Branch](
-	[branch_id] [int] IDENTITY(1,1) NOT NULL,
-	[branch_number] [int] NULL,
-	[development_release_id] [int] NULL,
-	[product_id] [int] NULL,
- CONSTRAINT [PK__Branch] PRIMARY KEY CLUSTERED 
-(
-	[branch_id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-
-GO
-/****** Object:  Table [dbo].[City]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[City]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -59,7 +42,7 @@ CREATE TABLE [dbo].[City](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Company]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Company]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -80,7 +63,7 @@ CREATE TABLE [dbo].[Company](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Country]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Country]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -99,7 +82,7 @@ CREATE TABLE [dbo].[Country](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Customer]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Customer]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -121,7 +104,7 @@ CREATE TABLE [dbo].[Customer](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[CustomerRelease]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[CustomerRelease]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -129,7 +112,6 @@ GO
 SET ANSI_PADDING ON
 GO
 CREATE TABLE [dbo].[CustomerRelease](
-	[changelog] [varchar](200) NULL,
 	[customer_release_id] [int] IDENTITY(1,1) NOT NULL,
 	[development_release_id] [int] NOT NULL,
 	[customer_release_date] [date] NULL,
@@ -143,25 +125,14 @@ CREATE TABLE [dbo].[CustomerRelease](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[date_test]    Script Date: 5/5/2016 5:33:22 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[date_test](
-	[date_column] [date] NULL,
-	[date_id] [int] NULL
-) ON [PRIMARY]
-
-GO
-/****** Object:  Table [dbo].[DevelopmentRelease]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[DevelopmentRelease]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[DevelopmentRelease](
 	[development_release_id] [int] IDENTITY(1,1) NOT NULL,
-	[development_release_number] [int] NULL,
+	[development_release_number] [float] NOT NULL,
 	[version_id] [int] NULL,
 	[product_id] [int] NOT NULL,
  CONSTRAINT [PK_DevelopmentRelease] PRIMARY KEY CLUSTERED 
@@ -171,7 +142,7 @@ CREATE TABLE [dbo].[DevelopmentRelease](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[Download]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Download]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -181,10 +152,8 @@ GO
 CREATE TABLE [dbo].[Download](
 	[customer_id] [int] NULL,
 	[customer_release_id] [int] NULL,
-	[date_id] [int] NULL,
 	[download_id] [int] IDENTITY(1,1) NOT NULL,
 	[download_link] [varchar](100) NULL,
-	[software_platform_id] [int] NULL,
 	[product_id] [int] NULL,
 	[download_date] [date] NULL,
  CONSTRAINT [PK__Download] PRIMARY KEY CLUSTERED 
@@ -196,7 +165,7 @@ CREATE TABLE [dbo].[Download](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Feature]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Feature]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -206,7 +175,6 @@ GO
 CREATE TABLE [dbo].[Feature](
 	[feature_description] [varchar](100) NULL,
 	[feature_id] [int] IDENTITY(1,1) NOT NULL,
-	[product_id] [int] NULL,
 	[bugfix] [bit] NOT NULL,
  CONSTRAINT [PK__Feature] PRIMARY KEY CLUSTERED 
 (
@@ -217,7 +185,7 @@ CREATE TABLE [dbo].[Feature](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[FeatureVersion]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[FeatureVersion]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -233,30 +201,16 @@ CREATE TABLE [dbo].[FeatureVersion](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[Iteration]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Phone]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[Iteration](
-	[branch_id] [int] NULL,
-	[iteration_id] [int] IDENTITY(1,1) NOT NULL,
-	[iteration_number] [int] NULL,
- CONSTRAINT [PK__Iteration] PRIMARY KEY CLUSTERED 
-(
-	[iteration_id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-
-GO
-/****** Object:  Table [dbo].[Phone]    Script Date: 5/5/2016 5:33:22 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
+SET ANSI_PADDING ON
 GO
 CREATE TABLE [dbo].[Phone](
-	[phone_id] [int] NOT NULL,
-	[phone_number] [int] NULL,
+	[phone_id] [int] IDENTITY(1,1) NOT NULL,
+	[phone_number] [varchar](20) NULL,
 	[phone_type_id] [int] NULL,
  CONSTRAINT [PK__Phone] PRIMARY KEY CLUSTERED 
 (
@@ -265,7 +219,9 @@ CREATE TABLE [dbo].[Phone](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[PhoneType]    Script Date: 5/5/2016 5:33:22 AM ******/
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[PhoneType]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -284,7 +240,7 @@ CREATE TABLE [dbo].[PhoneType](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Product]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Product]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -304,28 +260,7 @@ CREATE TABLE [dbo].[Product](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[sample data]    Script Date: 5/5/2016 5:33:22 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[sample data](
-	[Product] [varchar](50) NULL,
-	[Platform] [varchar](50) NULL,
-	[Description] [varchar](50) NULL,
-	[Version] [varchar](50) NULL,
-	[New Features] [varchar](50) NULL,
-	[Release] [varchar](50) NULL,
-	[type of release] [varchar](50) NULL,
-	[Date of release] [varchar](50) NULL
-) ON [PRIMARY]
-
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[SoftwarePlatform]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[SoftwarePlatform]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -344,7 +279,7 @@ CREATE TABLE [dbo].[SoftwarePlatform](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[State]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[State]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -353,7 +288,7 @@ SET ANSI_PADDING ON
 GO
 CREATE TABLE [dbo].[State](
 	[state_id] [int] IDENTITY(1,1) NOT NULL,
-	[state_name] [varchar](50) NOT NULL,
+	[state_name] [varchar](50) NULL,
  CONSTRAINT [PK__State] PRIMARY KEY CLUSTERED 
 (
 	[state_id] ASC
@@ -363,7 +298,7 @@ CREATE TABLE [dbo].[State](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [dbo].[Version]    Script Date: 5/5/2016 5:33:22 AM ******/
+/****** Object:  Table [dbo].[Version]    Script Date: 5/5/2016 7:56:13 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -402,16 +337,6 @@ ALTER TABLE [dbo].[Address]  WITH CHECK ADD  CONSTRAINT [FK_Address_State] FOREI
 REFERENCES [dbo].[State] ([state_id])
 GO
 ALTER TABLE [dbo].[Address] CHECK CONSTRAINT [FK_Address_State]
-GO
-ALTER TABLE [dbo].[Branch]  WITH CHECK ADD  CONSTRAINT [FK_Branch_DevelopmentRelease] FOREIGN KEY([development_release_id])
-REFERENCES [dbo].[DevelopmentRelease] ([development_release_id])
-GO
-ALTER TABLE [dbo].[Branch] CHECK CONSTRAINT [FK_Branch_DevelopmentRelease]
-GO
-ALTER TABLE [dbo].[Branch]  WITH CHECK ADD  CONSTRAINT [FK_Branch_Product] FOREIGN KEY([product_id])
-REFERENCES [dbo].[Product] ([product_id])
-GO
-ALTER TABLE [dbo].[Branch] CHECK CONSTRAINT [FK_Branch_Product]
 GO
 ALTER TABLE [dbo].[Company]  WITH CHECK ADD  CONSTRAINT [FK_Company_Address] FOREIGN KEY([address_id])
 REFERENCES [dbo].[Address] ([address_id])
@@ -458,11 +383,6 @@ REFERENCES [dbo].[Product] ([product_id])
 GO
 ALTER TABLE [dbo].[Download] CHECK CONSTRAINT [FK_Download_Product]
 GO
-ALTER TABLE [dbo].[Download]  WITH CHECK ADD  CONSTRAINT [FK_Download_SoftwarePlatform] FOREIGN KEY([software_platform_id])
-REFERENCES [dbo].[SoftwarePlatform] ([software_platform_id])
-GO
-ALTER TABLE [dbo].[Download] CHECK CONSTRAINT [FK_Download_SoftwarePlatform]
-GO
 ALTER TABLE [dbo].[FeatureVersion]  WITH CHECK ADD  CONSTRAINT [FK_FeatureVersion_Feature] FOREIGN KEY([feature_id])
 REFERENCES [dbo].[Feature] ([feature_id])
 GO
@@ -472,11 +392,6 @@ ALTER TABLE [dbo].[FeatureVersion]  WITH CHECK ADD  CONSTRAINT [FK_FeatureVersio
 REFERENCES [dbo].[Version] ([version_id])
 GO
 ALTER TABLE [dbo].[FeatureVersion] CHECK CONSTRAINT [FK_FeatureVersion_Version]
-GO
-ALTER TABLE [dbo].[Iteration]  WITH CHECK ADD  CONSTRAINT [FK_Iteration_Branch] FOREIGN KEY([branch_id])
-REFERENCES [dbo].[Branch] ([branch_id])
-GO
-ALTER TABLE [dbo].[Iteration] CHECK CONSTRAINT [FK_Iteration_Branch]
 GO
 ALTER TABLE [dbo].[Phone]  WITH CHECK ADD  CONSTRAINT [FK_Phone_PhoneType] FOREIGN KEY([phone_type_id])
 REFERENCES [dbo].[PhoneType] ([phone_type_id])
