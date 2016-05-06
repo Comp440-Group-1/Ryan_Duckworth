@@ -1,0 +1,32 @@
+Name: Ryan Duckworth
+Date: 5/5/16
+Course: COMP 440 Database Design
+
+Database Disaster Recovery Policy
+
+A database is meant to hold key information for safe keeping and for Business Intelligence/Business Value.
+
+However, in the event of a disaster that destroys or otherwise harms the database this Recovery Policy will
+assist in resuming normal operations in a timely fashion.
+
+The most important part of this policy is the routine backup of the database. This policy will use the SQL
+Simple Recovery Model. Under this model, routine backups of the database are performed at set intervals and
+in the event of data loss or database damage, the most recent backup will be used to restore the database.
+
+The rationale for using this model over more comprehensive model is that due to the low volume of data being
+managed by this database currently, the risk associated with a simple model is worth losing the extra overhead
+involved with a more complex backup model.
+
+In the Disaster Recovery folder where this text document is located, you will find a database_backup.sql file.
+This file is used to initiate a backup of the database to the specified location on the attached disk drive.
+This script can be used to perform routine backups. It is recommended to backup daily with the current volume
+of data entering the database.
+
+Also in the Disaster Recovery folder is a full_database_dump.sql and sql_full_sample_data_insert_queries.sql files.
+These sql files can be used to restore the database tables, stored procedures, indexes, sample data, and relationships to the state
+they were at the time of this text file's creation. (5/5/16) These sql files should only be used if the data on the database
+itself is not desired. If the data is desired, then restoring from a backup that was made using the
+database_backup.sql script should be used instead.
+
+If this policy is followed, then even in the event of a database disaster, the most important data in the database
+should be backed up and ready to be recovered.
